@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>E-Commerce Order Fulfillment</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"/>
+  <link rel="stylesheet" href="css/styles.css"/>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <a class="navbar-brand font-weight-bold" href="#"><i class="fas fa-shopping-cart mr-2"></i>OrderFulfillment</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="nav">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item"><a class="nav-link" href="#" onclick="showPage('home')">Home</a></li>
+      <li class="nav-item"><a class="nav-link" href="#" onclick="showPage('catalog')">Catalog</a></li>
+      <li class="nav-item"><a class="nav-link" href="#" onclick="showPage('newOrder')">New Order</a></li>
+      <li class="nav-item"><a class="nav-link" href="#" onclick="showPage('orders')">Orders</a></li>
+      <li class="nav-item"><a class="nav-link" href="#" onclick="showPage('shipments')">Shipments</a></li>
+      <li class="nav-item"><a class="nav-link" href="#" onclick="showPage('notifications')">Notifications</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div id="alertBanner" class="d-none"></div>
+
+<!-- Home -->
+<div id="page-home">
+  <div class="hero-section text-white text-center py-5">
+    <div class="container py-4">
+      <h1 class="display-4 font-weight-bold"><i class="fas fa-shipping-fast mr-3"></i>E-Commerce Order Fulfillment</h1>
+      <p class="lead mt-3">Independent microservices for inventory, orders, payments, shipping, and notifications.<br/>
+      Choreography-based Saga pattern via Kafka for distributed transaction management.</p>
+      <div class="mt-4">
+        <button class="btn btn-warning btn-lg mr-2" onclick="showPage('catalog')"><i class="fas fa-th mr-2"></i>Browse Catalog</button>
+        <button class="btn btn-outline-light btn-lg" onclick="showPage('newOrder')"><i class="fas fa-plus mr-2"></i>Place Order</button>
+      </div>
+    </div>
+  </div>
+  <div class="container mt-5">
+    <div class="row text-center mb-4">
+      <div class="col-md-4">
+        <div class="feature-card card border-0 shadow-sm p-4">
+          <i class="fas fa-boxes fa-3x text-primary mb-3"></i>
+          <h5>Inventory Service</h5>
+          <p class="text-muted small">Manages product catalog and stock levels. Reserves inventory per order with automatic rollback on payment failure.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-card card border-0 shadow-sm p-4">
+          <i class="fas fa-stream fa-3x text-success mb-3"></i>
+          <h5>Kafka Event Choreography</h5>
+          <p class="text-muted small">9 event types across 5 services. Each service reacts to events independently — no central orchestrator needed.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-card card border-0 shadow-sm p-4">
+          <i class="fas fa-truck fa-3x text-warning mb-3"></i>
+          <h5>Shipping & Tracking</h5>
+          <p class="text-muted small">Automatically creates shipments on payment success. Track packages from dispatch to delivery in real time.</p>
+        </div>
+      </div>
+    </div>
+    <div class="row text-center">
+      <div class="col-md-12">
+        <div class="card border-0 shadow-sm p-4 bg-light">
+          <h5 class="mb-3"><i class="fas fa-sitemap mr-2"></i>Event Flow</h5>
+          <div class="flow-diagram">
+            <span class="badge badge-primary p-2 mr-2">Order Created</span>
+            <i class="fas fa-arrow-right text-muted mr-2"></i>
+            <span class="badge badge-info p-2 mr-2">Inventory Reserved</span>
+            <i class="fas fa-arrow-right text-muted mr-2"></i>
+            <span class="badge badge-success p-2 mr-2">Payment Completed</span>
+            <i class="fas fa-arrow-right text-muted mr-2"></i>
+            <span class="badge badge-warning p-2 mr-2">Shipment Created</span>
+            <i class="fas fa-arrow-right text-muted mr-2"></i>
+            <span class="badge badge-secondary p-2">Delivered</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Catalog -->
+<div id="page-catalog" class="d-none">
+  <div class="container mt-4">
+    <h3 class="mb-4"><i class="fas fa-th mr-2"></i>Product Catalog</h3>
+    <div id="catalogGrid" class="row"></div>
+  </div>
+</div>
+
+<!-- New Order -->
+<div id="page-newOrder" class="d-none">
+  <div class="container mt-4">
+    <h3 class="mb-4"><i class="fas fa-plus-circle mr-2 text-success"></i>Place New Order</h3>
+    <div class="row">
+      <div class="col-md-7">
+        <form onsubmit="submitOrder(event)" class="card shadow-sm p-4">
+          <h6 class="border-bottom pb-2 mb-3">Customer Information</h6>
+          <div class="form-row">
+            <div class="form-group col-md-4">
+              <label>Customer ID</label>
+              <input type="text" id="custId" class="form-control" placeholder="CUST-001" required/>
+            </div>
+            <div class="form-group col-md-4">
+              <label>Full Name</label>
+              <input type="text" id="custName" class="form-control" placeholder="John Doe" required/>
+            </div>
+            <div class="form-group col-md-4">
+              <label>Email</label>
+              <input type="email" id="custEmail" class="form-control" placeholder="john@example.com" required/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Shipping Address</label>
+            <input type="text" id="shipAddr" class="form-control" placeholder="123 Main St, New York, NY 10001" required/>
+          </div>
+          <div class="form-group">
+            <label>Payment Method</label>
+            <select id="payMethod" class="form-control">
+              <option value="CREDIT_CARD">Credit Card</option>
+              <option value="DEBIT_CARD">Debit Card</option>
+              <option value="BANK_TRANSFER">Bank Transfer</option>
+              <option value="DIGITAL_WALLET">Digital Wallet</option>
+            </select>
+          </div>
+
+          <h6 class="border-bottom pb-2 mb-3 mt-2">Order Items</h6>
+          <div id="orderItemsContainer">
+            <div class="order-item-row form-row mb-2">
+              <div class="col-md-3">
+                <select class="form-control item-sku" onchange="fillProductName(this)">
+                  <option value="">Select SKU</option>
+                  <option value="LAPTOP-001" data-name="Gaming Laptop Pro 15" data-price="1299.99">LAPTOP-001</option>
+                  <option value="PHONE-001" data-name="Smartphone Ultra X" data-price="899.99">PHONE-001</option>
+                  <option value="HEADPHONE-001" data-name="Wireless Headphones" data-price="249.99">HEADPHONE-001</option>
+                  <option value="TABLET-001" data-name="Professional Tablet 12\"" data-price="649.99">TABLET-001</option>
+                  <option value="WATCH-001" data-name="Smart Watch Series 8" data-price="399.99">WATCH-001</option>
+                  <option value="SHIRT-001" data-name="Premium Cotton T-Shirt" data-price="29.99">SHIRT-001</option>
+                  <option value="JEANS-001" data-name="Slim Fit Denim Jeans" data-price="59.99">JEANS-001</option>
+                  <option value="SNEAKER-001" data-name="Running Sneakers Pro" data-price="89.99">SNEAKER-001</option>
+                  <option value="BOOK-001" data-name="Java Microservices in Practice" data-price="49.99">BOOK-001</option>
+                  <option value="BACKPACK-001" data-name="Laptop Backpack 30L" data-price="79.99">BACKPACK-001</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <input type="text" class="form-control item-name" placeholder="Product Name" required/>
+              </div>
+              <div class="col-md-2">
+                <input type="number" class="form-control item-qty" placeholder="Qty" min="1" value="1" required onchange="calcTotal()"/>
+              </div>
+              <div class="col-md-2">
+                <input type="number" class="form-control item-price" placeholder="Price" step="0.01" required onchange="calcTotal()"/>
+              </div>
+              <div class="col-md-1">
+                <button type="button" class="btn btn-outline-danger btn-sm mt-1" onclick="removeItem(this)"><i class="fas fa-times"></i></button>
+              </div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="addItem()"><i class="fas fa-plus mr-1"></i>Add Item</button>
+            <span class="ml-3 font-weight-bold">Total: $<span id="orderTotal">0.00</span></span>
+          </div>
+          <button type="submit" class="btn btn-success btn-lg btn-block"><i class="fas fa-paper-plane mr-2"></i>Place Order</button>
+        </form>
+      </div>
+      <div class="col-md-5">
+        <div id="orderResult"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Orders -->
+<div id="page-orders" class="d-none">
+  <div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3><i class="fas fa-list-alt mr-2"></i>Orders</h3>
+      <div>
+        <input type="text" id="orderCustomerFilter" class="form-control d-inline w-auto mr-2" placeholder="Customer ID"/>
+        <button class="btn btn-outline-primary btn-sm" onclick="loadOrders()">Filter</button>
+        <button class="btn btn-outline-secondary btn-sm ml-1" onclick="document.getElementById('orderCustomerFilter').value=''; loadOrders()">All</button>
+      </div>
+    </div>
+    <div id="ordersTable"></div>
+  </div>
+</div>
+
+<!-- Shipments -->
+<div id="page-shipments" class="d-none">
+  <div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3><i class="fas fa-truck mr-2"></i>Shipments</h3>
+      <div>
+        <input type="text" id="trackInput" class="form-control d-inline w-auto mr-2" placeholder="Tracking Number"/>
+        <button class="btn btn-outline-primary btn-sm" onclick="trackShipment()">Track</button>
+        <button class="btn btn-outline-secondary btn-sm ml-1" onclick="loadShipments()">All</button>
+      </div>
+    </div>
+    <div id="shipmentsTable"></div>
+  </div>
+</div>
+
+<!-- Notifications -->
+<div id="page-notifications" class="d-none">
+  <div class="container-fluid mt-4">
+    <h3 class="mb-4"><i class="fas fa-bell mr-2"></i>Notifications</h3>
+    <div id="notificationsTable"></div>
+  </div>
+</div>
+
+<footer class="footer mt-5 py-3 bg-dark text-white">
+  <div class="container text-center">
+    <small>E-Commerce Order Fulfillment Microservices &mdash; Java 17 &bull; Spring Boot 2.7.8 &bull; Kafka &bull; MySQL &bull; Docker &bull; Kubernetes &bull; AWS &bull; Jenkins</small>
+  </div>
+</footer>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ecommerce-config
+  namespace: ecommerce
+data:
+  SPRING_KAFKA_BOOTSTRAP_SERVERS: "kafka-service:9092"
+  SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
+  MYSQL_HOST: "mysql-service"
+  MYSQL_PORT: "3306"
